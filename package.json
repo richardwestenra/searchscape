@@ -1,0 +1,11 @@
+{
+  "name": "searchscape",
+  "version": "0.0.1",
+  "description": "Parse Searchscape text and format it properly",
+  "main": "searchscape.js",
+  "author": "Richard Westenra",
+  "license": "MIT",
+  "devDependencies": {
+    "mustache": "^2.2.1"
+  }
+}
