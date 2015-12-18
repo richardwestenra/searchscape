@@ -11,9 +11,7 @@ fs.readFile(inputFile, 'utf8', function (err, input) {
 
   var data = formatData(input);
 
-  var template = processData(data);
-  template('sections');
-  template('nav');
+  ['sections', 'nav'].forEach( processData(data) );
 
 });
 
@@ -29,7 +27,8 @@ function formatData(text) {
       caption: get('caption'),
       video: get('video'),
       quote: get('quote'),
-      citation: get('citation')
+      citation: get('citation'),
+      links: marked( get('links') || '' )
     };
   });
 }

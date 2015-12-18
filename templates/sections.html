@@ -1,12 +1,12 @@
 {{#sections}}
 <section class="section" id="section-{{id}}">
-    <span class="intro">
+    <span class="intro wrapper">
         {{{intro}}}
     </span>
-	<figure>
-		<img src="{{image}}" />
-		<figcaption>{{caption}}</figcaption>
-	</figure>
+    <figure>
+        <img src="{{image}}" />
+        <figcaption>{{caption}}</figcaption>
+    </figure>
     <figure>
         <video src="{{video}}"></video>
     </figure>
@@ -16,5 +16,8 @@
             <cite>{{citation}}</cite>
         </span>
     </blockquote>
+    <span class="wrapper">
+        {{{links}}}
+    </span>
 </section>
 {{/sections}}
