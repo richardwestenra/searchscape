@@ -1,21 +1,32 @@
-var fs = require('fs');
-var mustache = require('mustache');
+var fs = require('fs'),
+ mustache = require('mustache'),
+ marked = require('marked');
 
 
-fs.readFile('input.html', 'utf8', function (err, input) {
+var options = {
+  inputFile: 'input.md',
+  outputFile: 'output.html',
+  sectionTmpl: 'section.html'
+};
+
+
+fs.readFile(options.inputFile, 'utf8', function (err, input) {
   if (err) {
     return console.log(err);
   }
   // console.log('Input file was read!');
 
-  fs.readFile('template.html', 'utf8', function (err, tmpl) {
+  fs.readFile(options.sectionTmpl, 'utf8', function (err, tmpl) {
     if (err) {
       return console.log(err);
     }
     // console.log('Template file was read!');
 
 
-    writeFile('output.html', toHtml(tmpl, formatData(input) ) );
+    writeFile(
+      options.outputFile,
+      toHtml(tmpl, formatData(input) )
+    );
 
   });
 
@@ -23,9 +34,11 @@ fs.readFile('input.html', 'utf8', function (err, input) {
 
 
 function formatData(text) {
-  return text.split('===').map(function (d, i) {
+  return text.split(/---+/).map(function (d, i) {
     return {
       id: i,
+      intro: marked( get(d, 'intro') || '' ),
+      // intro: get(d, 'intro'),
       image: get(d, 'image'),
       caption: get(d, 'caption'),
       video: get(d, 'video'),
@@ -42,11 +55,13 @@ function toHtml(template, data) {
   }).join('');
 }
 
+
 function get(text, id) {
   var regex = new RegExp('\{\{'+id+'\}\}([^\{]+)\{\{\/'+id+'\}\}','i');
   var result = text.match(regex);
   return result ? result[1] : console.error('No match for ID '+id);
 }
+
 
 function writeFile(location, content) {
   fs.writeFile(location, content, function(err) {

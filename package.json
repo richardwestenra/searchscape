@@ -6,6 +6,7 @@
   "author": "Richard Westenra",
   "license": "MIT",
   "devDependencies": {
+    "marked": "^0.3.5",
     "mustache": "^2.2.1"
   }
 }
