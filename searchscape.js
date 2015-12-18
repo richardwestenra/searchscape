@@ -3,71 +3,67 @@ var fs = require('fs'),
  marked = require('marked');
 
 
-var options = {
-  inputFile: 'input.md',
-  outputFile: 'output.html',
-  sectionTmpl: 'section.html'
-};
+var inputFile = 'content.md';
 
 
-fs.readFile(options.inputFile, 'utf8', function (err, input) {
-  if (err) {
-    return console.log(err);
-  }
-  // console.log('Input file was read!');
+fs.readFile(inputFile, 'utf8', function (err, input) {
+  if (err) { return console.log(err); }
 
-  fs.readFile(options.sectionTmpl, 'utf8', function (err, tmpl) {
-    if (err) {
-      return console.log(err);
-    }
-    // console.log('Template file was read!');
+  var data = formatData(input);
 
-
-    writeFile(
-      options.outputFile,
-      toHtml(tmpl, formatData(input) )
-    );
-
-  });
+  var template = processData(data);
+  template('sections');
+  template('nav');
 
 });
 
 
 function formatData(text) {
   return text.split(/---+/).map(function (d, i) {
+    var get = makeRegex(d);
     return {
       id: i,
-      intro: marked( get(d, 'intro') || '' ),
-      // intro: get(d, 'intro'),
-      image: get(d, 'image'),
-      caption: get(d, 'caption'),
-      video: get(d, 'video'),
-      quote: get(d, 'quote'),
-      citation: get(d, 'citation')
+      intro: marked( get('intro') || '' ),
+      // intro: get('intro'),
+      image: get('image'),
+      caption: get('caption'),
+      video: get('video'),
+      quote: get('quote'),
+      citation: get('citation')
     };
   });
 }
 
 
-function toHtml(template, data) {
-  return data.map(function (section) {
-    return mustache.render(template, section);
-  }).join('');
+function processData(data) {
+  return function (name) {
+    fs.readFile('templates/'+name+'.html', 'utf8', function (err, tmpl) {
+      if (err) { return console.log(err); }
+
+      var obj = {};
+      obj[name] = data;
+
+      writeFile(
+        'output/'+name+'.html',
+        mustache.render(tmpl, obj)
+      );
+    });
+  };
 }
 
 
-function get(text, id) {
-  var regex = new RegExp('\{\{'+id+'\}\}([^\{]+)\{\{\/'+id+'\}\}','i');
-  var result = text.match(regex);
-  return result ? result[1] : console.error('No match for ID '+id);
+function makeRegex(text) {
+  return function (id) {
+    var regex = new RegExp('\{\{'+id+'\}\}([^\{]+)\{\{\/'+id+'\}\}','i');
+    var result = text.match(regex);
+    return result ? result[1] : console.error('No match for ID '+id);
+  };
 }
 
 
 function writeFile(location, content) {
   fs.writeFile(location, content, function(err) {
-    if (err) {
-      return console.log(err);
-    }
+    if (err) { return console.log(err); }
     console.log('Output file saved successfully :)');
   });
 }
